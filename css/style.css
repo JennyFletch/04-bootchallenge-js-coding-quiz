@@ -1,5 +1,6 @@
 :root {
-    --highlight-color: #710e77;
+    --accent-color: #710e77;
+    --accent-highlight-color: #891191;
     --page-width: 600px;
 }
 
@@ -11,7 +12,7 @@ body {
 
 h1, h3 {
     font-size: 2rem;
-    padding: 10% 0 5% 0; 
+    padding: 8% 0 5% 0; 
     max-width: var(--page-width);
     margin:0 auto;
 }
@@ -24,13 +25,13 @@ header section {
     display: flex;
     flex-direction: row;
     justify-content: space-between;
-    color: var(--highlight-color);
+    color: var(--accent-color);
     font-weight: bold;
 }
 
 header section a {
     text-decoration: underline;
-    color: var(--highlight-color);
+    color: var(--accent-color);
 }
 
 ul { 
@@ -40,11 +41,15 @@ ul {
 }
 
 li {
-    background-color: var(--highlight-color);
+    background-color: var(--accent-color);
     color: #fff;
     padding: 8px 16px;
     border-radius: 4px;
     margin-bottom: 10px; 
+}
+li:hover {
+    background-color: var(--accent-highlight-color);
+    cursor: pointer;
 }
 
 p#system-message {
