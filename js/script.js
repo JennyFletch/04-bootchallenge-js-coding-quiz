@@ -42,6 +42,7 @@ function showQandA(qnum) {
         var quizAnswer = document.createElement("li");
         var ansOrderNum = ansOrder[i];
         quizAnswer.textContent = (Number(i) + 1) + ". " + eval(currentQuestion)[ansOrderNum];
+        quizAnswer.setAttribute("data-qNumber", (i+1)); 
         quizAnswersEl.appendChild(quizAnswer);
     }
     console.log("The right answer is " + currentRightAnswer);
@@ -62,19 +63,35 @@ function setTimer(){
 
 quizAnswersEl.addEventListener("click", function(event) {
     
+    //event.stopPropagation();
     var element = event.target;
+
     if(element.matches("span") && !quizStarted) {
         // Set up and start the quiz
 
-        event.stopPropagation();
         welcomeEl.setAttribute("style", "display:none"); // Hide the welcome message
         element.closest("li").setAttribute("style", "display:none"); // Hide the button
         quizQuestionEl.setAttribute("style", "display:block"); // Show the Question element
         showQandA(2); // Display the first question
         setTimer();   // Start the timer
         quizStarted = true;
+    } else {
+        
+        // var chosenAnswer = document.querySelector('#quizQuestionEl :nth-child(' + Number(currentRightAnswer) + ')');
+        // var chosenAnswer = document.querySelector('#quizAnswersEl div:nth-child(2)');
+        //console.log("system thinks it's " + chosenAnswer);
+        //var chosenAnswer = toString(element).charAt(5);
+        //var chosenAnswer = index(eval(element));
+        var chosenAnswer = event.target.getAttribute('data-qNumber');
+       // event.target.getAttribute('data-bar')
+        console.log(chosenAnswer);
+
+        if(Number(chosenAnswer) === Number(currentRightAnswer)){
+            systemMessage.innerHTML = "<hr />Correct!";
+        } else {
+            systemMessage.innerHTML = "<hr />Wrong!";
+        }
     }
-    
 });
 
 
@@ -84,8 +101,7 @@ quizAnswersEl.addEventListener("click", function(event) {
 
 
 
-// Let user know if answer is right or wrong
-systemMessage.innerHTML = "Correct";
+
 
 
 
