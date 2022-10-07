@@ -1,12 +1,15 @@
 // Global variables
 var quizTimer = 75;
 var quizScore = 0;
+var welcomeEl = document.querySelector("#welcomeMessageEl");
 var quizQuestionEl = document.querySelector("#quizQuestionEl");
 var quizAnswersEl = document.querySelector("#quizAnswersEl");
 var currentRightAnswer = 0;
 var systemMessage = document.querySelector("#system-message");
 var ticker = document.querySelector("#ticker");
+var getStartedBtn = document.querySelector("#getStarted");
 const quizHighScores = [];
+var quizStarted = false;
 
 
 // Get a random order for the answers
@@ -38,7 +41,7 @@ function showQandA(qnum) {
         }
         var quizAnswer = document.createElement("li");
         var ansOrderNum = ansOrder[i];
-        quizAnswer.textContent = eval(currentQuestion)[ansOrderNum];
+        quizAnswer.textContent = (Number(i) + 1) + ". " + eval(currentQuestion)[ansOrderNum];
         quizAnswersEl.appendChild(quizAnswer);
     }
     console.log("The right answer is " + currentRightAnswer);
@@ -57,10 +60,27 @@ function setTimer(){
 }
 
 
-setTimer();
+quizAnswersEl.addEventListener("click", function(event) {
+    
+    var element = event.target;
+    if(element.matches("span") && !quizStarted) {
+        // Set up and start the quiz
 
-// Display the question
-showQandA(2);
+        event.stopPropagation();
+        welcomeEl.setAttribute("style", "display:none"); // Hide the welcome message
+        element.closest("li").setAttribute("style", "display:none"); // Hide the button
+        quizQuestionEl.setAttribute("style", "display:block"); // Show the Question element
+        showQandA(2); // Display the first question
+        setTimer();   // Start the timer
+        quizStarted = true;
+    }
+    
+});
+
+
+
+
+
 
 
 

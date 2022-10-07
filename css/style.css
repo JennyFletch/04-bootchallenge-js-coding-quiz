@@ -15,10 +15,12 @@ h1, h3 {
     padding: 8% 0 5% 0; 
     max-width: var(--page-width);
     margin:0 auto;
+    text-align: center;
 }
 
-h1 {
-    text-align: center;
+h3 {
+    display:none;
+    text-align: left;
 }
 
 header section { 
@@ -45,11 +47,28 @@ li {
     color: #fff;
     padding: 8px 16px;
     border-radius: 4px;
-    margin-bottom: 10px; 
+    margin-bottom: 4px; 
+    display: block;
 }
+
 li:hover {
     background-color: var(--accent-highlight-color);
     cursor: pointer;
+}
+
+li#getStarted, li#getStarted:hover {
+    background: none;
+    text-align: center; 
+}
+
+li#getStarted span {
+    background-color: var(--accent-color);
+    padding: 8px 26px;
+    border-radius: 4px;
+}
+
+li#getStarted:hover span {
+    background-color: var(--accent-highlight-color);
 }
 
 p#system-message {
