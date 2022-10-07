@@ -5,6 +5,7 @@ var quizQuestionEl = document.querySelector("#quizQuestionEl");
 var quizAnswersEl = document.querySelector("#quizAnswersEl");
 var currentRightAnswer = 0;
 var systemMessage = document.querySelector("#system-message");
+var ticker = document.querySelector("#ticker");
 const quizHighScores = [];
 
 
@@ -29,7 +30,7 @@ function showQandA(qnum) {
     // Get a random order for the answers
     var ansOrder = getAnswerOrder();
     
-    //use ansOrder instead of for loop
+    // Display answers in random order, keeping track of correct one
     for (var i = 0; i < 4; i++) {
         var answerNumber = ansOrder[i];
         if(answerNumber === 1) {
@@ -44,7 +45,26 @@ function showQandA(qnum) {
 }
 
 
+function setTimer(){
+    var timerInterval = setInterval(function() {
+        quizTimer--;
+        ticker.innerHTML = quizTimer;
+
+        if(quizTimer === 0) {
+             clearInterval(timerInterval);
+        }
+    }, 1000);
+}
+
+
+setTimer();
+
+// Display the question
 showQandA(2);
+
+
+
+// Let user know if answer is right or wrong
 systemMessage.innerHTML = "Correct";
 
 
