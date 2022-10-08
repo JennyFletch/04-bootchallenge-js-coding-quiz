@@ -1,17 +1,22 @@
-// Global variables
-var quizTimer = 75;
-var quizScore = 0;
+// Global variables and page elements
+
 var welcomeEl = document.querySelector("#welcomeMessageEl");
 var quizQuestionEl = document.querySelector("#quizQuestionEl");
 var quizAnswersEl = document.querySelector("#quizAnswersEl");
-var currentRightAnswer = 0;
-var quizQuestionCurrent = 1;
 var systemMessage = document.querySelector("#system-message");
 var ticker = document.querySelector("#ticker");
 var getStartedBtn = document.querySelector("#getStarted");
+var highScoresEl = document.querySelector("#highScoresEl");
+var finalScore = document.querySelector("#finalScore");
+
+var currentRightAnswer = 0;
+var quizQuestionCurrent = 1;
+var quizTimer = 75;
+var quizScore = 0;
 var userScore = 0;
-const quizHighScores = [];
 var quizStarted = false;
+var gameOver = false;
+const quizHighScores = [];
 
 
 // Get a random order for the answers
@@ -26,6 +31,13 @@ function getAnswerOrder() {
     return(numArray);
 }
 
+function displayGameOver() {
+    quizQuestionEl.setAttribute("style", "display:none");
+    welcomeMessageEl.innerHTML = "All done!";
+    welcomeMessageEl.setAttribute("style", "display:block");
+    highScoresEl.setAttribute("style", "display:block");
+    highScoresEl.children[0].innerHTML = "Your final score is " + userScore;
+}
 
 // Display the Question and Answers
 function showQandA(qnum) {
@@ -34,30 +46,41 @@ function showQandA(qnum) {
     if(quizQuestionEl) {
         systemMessage.innerHTML = "";
         var answerList = quizAnswersEl.querySelectorAll(':scope > li');
-        console.log(answerList);
         // Loop through the old list items and remove them
         answerList.forEach(listItem => listItem.remove());
     }
 
     var currentQuestion = "quizQuestion" + qnum;
-    quizQuestionEl.innerHTML = eval(currentQuestion)[0];
 
-    // Get a random order for the answers
-    var ansOrder = getAnswerOrder();
-    
-    // Display answers in random order, keeping track of correct one
-    for (var i = 0; i < 4; i++) {
-        var answerNumber = ansOrder[i];
-        if(answerNumber === 1) {
-            currentRightAnswer = i + 1;
+    if (Number(qnum) > numOfQuestions) {
+
+        // There are no more questions. End the game.
+        gameOver = true;
+        displayGameOver();
+
+    } else {
+
+        // There's another question. Show it to the user.
+
+        quizQuestionEl.innerHTML = eval(currentQuestion)[0];
+
+        // Get a random order for the answers
+        var ansOrder = getAnswerOrder();
+        
+        // Display answers in random order, keeping track of correct one
+        for (var i = 0; i < 4; i++) {
+            var answerNumber = ansOrder[i];
+            if(answerNumber === 1) {
+                currentRightAnswer = i + 1;
+            }
+            var quizAnswer = document.createElement("li");
+            var ansOrderNum = ansOrder[i];
+            quizAnswer.textContent = (Number(i) + 1) + ". " + eval(currentQuestion)[ansOrderNum];
+            quizAnswer.setAttribute("data-qNumber", (i+1)); 
+            quizAnswersEl.appendChild(quizAnswer);
         }
-        var quizAnswer = document.createElement("li");
-        var ansOrderNum = ansOrder[i];
-        quizAnswer.textContent = (Number(i) + 1) + ". " + eval(currentQuestion)[ansOrderNum];
-        quizAnswer.setAttribute("data-qNumber", (i+1)); 
-        quizAnswersEl.appendChild(quizAnswer);
+        console.log("The right answer is " + currentRightAnswer);
     }
-    console.log("The right answer is " + currentRightAnswer);
 }
 
 
@@ -70,6 +93,8 @@ function setTimer(){
              clearInterval(timerInterval);
         }
     }, 1000);
+
+    gameOver = true; // Timer has run out, game is over.
 }
 
 
@@ -91,6 +116,8 @@ quizAnswersEl.addEventListener("click", function(event) {
 
     } else {
         
+        // Check the user's answer and show the next question after a timeout
+
         var chosenAnswer = event.target.getAttribute('data-qNumber'); // Check with answer the user picked
 
         if(Number(chosenAnswer) === Number(currentRightAnswer)){
@@ -102,18 +129,15 @@ quizAnswersEl.addEventListener("click", function(event) {
         }
         quizQuestionCurrent++;
         setTimeout(() => { showQandA(quizQuestionCurrent); }, "1000"); // Ask the next question
-    }
+    
+    } 
 });
 
 
 
 
 
+// Allow user to track high score
 
-
-
-
-
-
-
+// Show list of previous high scores
 

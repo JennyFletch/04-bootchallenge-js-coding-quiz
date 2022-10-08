@@ -80,6 +80,31 @@ p#system-message {
     font-style: italic;
 }
 
+#highScoresEl {
+    display: none;
+}
+
+#highScoresEl p {
+    text-align: center;
+}
+
+#highScoresEl p#finalScore {
+    font-size: 1.25rem;
+    padding-bottom: 20px;
+    font-weight: bold
+}
+
+#highScoresEl .submitBtn {
+    background-color: var(--accent-color);
+    padding: 8px 26px;
+    border: none;
+    border-radius: 4px;
+}
+
+#highScoresEl:hover .submitBtn {
+    background-color: var(--accent-highlight-color);
+}
+
 @media(max-width:768px) {
     h1, h3 {
         font-size: 1.75rem;
