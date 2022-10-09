@@ -1,7 +1,9 @@
 // Global variables and page elements
 
-var scoreLink = document.querySelector("#scoreLink");
+var scoreLink = document.querySelector("#score-link");
 var welcomeEl = document.querySelector("#welcomeMessageEl");
+var gameInstructionsEl = document.querySelector("#gameInstructions");
+var getStartedEl = document.querySelector("#getStarted");
 var quizQuestionEl = document.querySelector("#quizQuestionEl");
 var quizAnswersEl = document.querySelector("#quizAnswersEl");
 var systemMessage = document.querySelector("#system-message");
@@ -15,13 +17,18 @@ var scoreList = document.querySelector("#scoreList");
 
 var currentRightAnswer = 0;
 var quizQuestionCurrent = 1;
-var quizTimer = 75;
+var quizTimer = 76;
 var quizScore = 0;
 var userScore = 0;
 var quizStarted = false;
+var firstGuess = true;
 var gameOver = false;
 
-//localStorage.clear(); // uncomment for testing only
+var highScoresOld = []; // From localStorage
+var highScoresNew = {}; // Sorted list to add to localStorage
+var addNewUserToList; // Check if user made the high scores list
+var lowestOldScore; // Score to replace if new user makes the list
+var oldUserToBump; // Track which scorer gets dropped from the list
 
 
 // Get a random order for the answers
@@ -36,12 +43,20 @@ function getAnswerOrder() {
     return(numArray);
 }
 
-function showHighScores () {
-
-}
 
 function displayGameOver() {
+    quizTimer = 0;
+
+    // If old question is up, remove it
+    if(quizQuestionEl) {
+        systemMessage.innerHTML = "";
+        var answerList = quizAnswersEl.querySelectorAll(':scope > li');
+        // Loop through the old list items and remove them
+        answerList.forEach(listItem => listItem.remove());
+    }
+
     quizQuestionEl.setAttribute("style", "display:none");
+    gameInstructionsEl.setAttribute("style", "display:none"); // Hide the instructions
     welcomeMessageEl.innerHTML = "All done!";
     welcomeMessageEl.setAttribute("style", "display:block");
     showScoreEl.setAttribute("style", "display:block");
@@ -94,13 +109,23 @@ function showQandA(qnum) {
 
 
 function setTimer(){
-    var timerInterval = setInterval(function() {
-        quizTimer--;
-        ticker.innerHTML = quizTimer;
 
-        if(quizTimer === 0) {
-             clearInterval(timerInterval);
+    var timerInterval = setInterval(function() {
+
+        if (quizTimer <= 0) { // timer ran out
+            clearInterval(timerInterval);
+            quizTimer = 0;
+            ticker.innerHTML = quizTimer;
+            displayGameOver();
+        } else if (quizTimer > 76) { // user clicked through to highscores instead of finishing quiz
+            clearInterval(timerInterval);
+            quizTimer = 0;
+            ticker.innerHTML = quizTimer;
+        } else { // game is on, keep time as usual
+            quizTimer--;
+            ticker.innerHTML = quizTimer;
         }
+
     }, 1000);
 
     gameOver = true; // Timer has run out, game is over.
@@ -117,27 +142,33 @@ quizAnswersEl.addEventListener("click", function(event) {
         // Set up and start the quiz
 
         welcomeEl.setAttribute("style", "display:none"); // Hide the welcome message
-        element.closest("li").remove(); // Remove the button list item
+        gameInstructionsEl.setAttribute("style", "display:none"); // Hide the instructions
+        getStartedEl.setAttribute("style", "display:none"); // Hide the button list item
         quizQuestionEl.setAttribute("style", "display:block"); // Show the Question element
         showQandA(quizQuestionCurrent); // Display the first question
+        quizTimer = 76;
         setTimer();   // Start the timer
         quizStarted = true;
 
-    } else {
+    } else if (firstGuess && event.target.getAttribute('data-qNumber') != null) {
         
-        // Check the user's answer and show the next question after a timeout
+        // Check the user's result and show the next question after a timeout
 
+        firstGuess = false; // prevent user from getting a second attempt at same question
         var chosenAnswer = event.target.getAttribute('data-qNumber'); // Check with answer the user picked
 
         if(Number(chosenAnswer) === Number(currentRightAnswer)){
             systemMessage.innerHTML = "<hr />Correct!";
             userScore++;
-        } else {
+        } else if (event.target.getAttribute('data-qNumber')) {
             systemMessage.innerHTML = "<hr />Wrong!";
             quizTimer -= 10; // Take 10 seconds off the timer
         }
         quizQuestionCurrent++;
-        setTimeout(() => { showQandA(quizQuestionCurrent); }, "1000"); // Ask the next question
+        setTimeout(() => { 
+            firstGuess = true; // reset variable for next question
+            showQandA(quizQuestionCurrent); 
+        }, "1000"); // Ask the next question
     
     } 
 });
@@ -145,11 +176,19 @@ quizAnswersEl.addEventListener("click", function(event) {
 
 function addToHighScores(userInits, score) {
 
-    var highScoresOld = []; // From localStorage
-    var highScoresNew = {}; // Sorted list to add to localStorage
-    var addNewUserToList = false; // Check if user made the high scores list
-    var lowestOldScore = 100; // Score to replace if new user makes the list
-    var oldUserToBump = 100; // Track which scorer gets dropped from the list
+    // Reset default values
+    highScoresOld = []; // From localStorage
+    highScoresNew = {}; // Sorted list to add to localStorage
+    addNewUserToList = false; // Check if user made the high scores list
+    lowestOldScore = 100; // Score to replace if new user makes the list
+    oldUserToBump = 100; // Track which scorer gets dropped from the list
+
+    // If old highscores list is in memory, remove it
+    if(scoreList) {
+        var scoresList = scoreList.querySelectorAll(':scope > li');
+        // Loop through the old list items and remove them
+        scoresList.forEach(listItem => listItem.remove());
+    }
 
     var jsonScores = JSON.parse(localStorage.getItem('jsonScores'));
 
@@ -175,12 +214,13 @@ function addToHighScores(userInits, score) {
                     lowestOldScore = oldScore;
                     oldUserToBump = i;
                 }
-            } else if (highScoresOld.length < 5) {
+            } else if (highScoresOld.length < 5 && score >= 0) {
                 addNewUserToList = true; // User made list by default
             }
         }
 
         if(addNewUserToList) {
+            
             var newEntry = userInits + " - " + score;
             highScoresNew['listRank1'] = newEntry;
 
@@ -206,9 +246,12 @@ function addToHighScores(userInits, score) {
         showScoreEl.setAttribute("style", "display:none");
         highScoresEl.setAttribute("style", "display:block");
 
-        var newHighScore = document.createElement("li");
-        newHighScore.textContent = userInits + " - " + score;
-        scoreList.appendChild(newHighScore);
+        // Make sure it's a real user and not a call from View Highscores
+        if(score >= 0 && addNewUserToList) {
+            var newHighScore = document.createElement("li");
+            newHighScore.textContent = userInits + " - " + score;
+            scoreList.appendChild(newHighScore);
+        }
 
         for (var i=0; i < highScoresOld.length; i++) {
             var storedHighScore = document.createElement("li");
@@ -219,9 +262,8 @@ function addToHighScores(userInits, score) {
         // Build the new JSON string and save new list to localStorage
         localStorage.setItem('jsonScores', JSON.stringify(highScoresNew));
 
-    } else {
+    } else if (score >= 0) {
         // Create the jsonScores object and set current user to listRank1
-        console.log("On the first-run path.");
         var newEntry = userInits + " - " + score;
         var newList = { "listRank1": newEntry }
         localStorage.setItem('jsonScores', JSON.stringify(newList));
@@ -234,6 +276,9 @@ function addToHighScores(userInits, score) {
         var newHighScore = document.createElement("li");
         newHighScore.textContent = userInits + " - " + score;
         scoreList.appendChild(newHighScore);
+
+    } else {
+        welcomeMessageEl.innerHTML = "No scores available";
     }
 }
 
@@ -254,28 +299,76 @@ showScoreEl.addEventListener("click", function(event) {
 });
 
 
-// Show list of previous high scores
 highScoresEl.addEventListener("click", function(event) {
 
     event.stopPropagation();
-    //which button was it?
     var element = event.target;
 
-    //if go back
     if(element.value === "Go Back") {
-        console.log('go back');
+        //Start the quiz all over again
+
+        currentRightAnswer = 0;
+        quizQuestionCurrent = 1;
+        quizTimer = 0;
+        quizScore = 0;
+        userScore = 0;
+        quizStarted = false;
+        gameOver = false;
+
+        highScoresOld = []; // From localStorage
+        highScoresNew = {}; // Sorted list to add to localStorage
+        addNewUserToList = false; // Check if user made the high scores list
+        lowestOldScore = 100; // Score to replace if new user makes the list
+        oldUserToBump = 100; // Track which scorer gets dropped from the list
+
+        getStartedEl.setAttribute("style", "display:none"); // Hide the get-started button
+        quizQuestionEl.setAttribute("style", "display:none"); // Hide the H3 tag
+        highScoresEl.setAttribute("style", "display:none"); // Hide the highscores list and buttons
+        welcomeEl.innerHTML = "Coding Quiz Challenge"; // Show the welcome message
+        gameInstructionsEl.setAttribute("style", "display:block"); // Show the instructions
+        quizAnswersEl.setAttribute("style", "display:flex;");
+        getStartedEl.setAttribute("style", "display:block"); // Show the get-started button
+        var newStartBtn = document.createElement("li");
+        newStartBtn.setAttribute("id", "getStarted");
+        var newStartBtnInner = document.createElement("span");
+        newStartBtnInner.textContent = "Start Quiz";
+        newStartBtn.appendChild(newStartBtnInner);
+        quizAnswersEl.appendChild(newStartBtn);
     }
 
-    //if clear highscores
     if(element.value === "Clear Highscores") {
-        console.log('clear highscores');
+        //Clear highscores from localStorage and page
+
+        localStorage.clear(); 
+        
+        for(var i=0; i < 5; i++) {
+            var scoreListLi = scoreList.firstElementChild;
+            if(scoreListLi) {
+                scoreList.removeChild(scoreListLi);
+            }
+        }
+        welcomeMessageEl.innerHTML = "No scores available";
     }
 
 });
 
+scoreLink.addEventListener("click", function(event) { 
+    // Show the user the current highscores list
+    quizTimer = 77;
 
+    // If old question is up, remove it
+    if(quizQuestionEl) {
+        systemMessage.innerHTML = "";
+        var answerList = quizAnswersEl.querySelectorAll(':scope > li');
+        // Loop through the old list items and remove them
+        answerList.forEach(listItem => listItem.remove());
+    }
 
-
-
-
-
+    quizQuestionEl.setAttribute("style", "display:none;"); // Hide the H3 tag if shown
+    getStartedEl.setAttribute("style", "display:none"); // Hide the get-started button if shown
+    welcomeEl.setAttribute("style", "display:block;"); // Hide the H1 tag if shown
+    gameInstructionsEl.setAttribute("style", "display:none"); // Hide the instructions if shown
+    highScoresEl.setAttribute("style", "display:block");
+    
+    addToHighScores("FPO", -1); // Call the highscores function with a dummy user
+});

@@ -42,6 +42,14 @@ header section #score-link:hover {
     color: var(--accent-highlight-color);
 }
 
+#gameInstructions p {
+    margin: 0 auto 30px auto;
+    padding: 0;
+    font-size:1.25rem;
+    max-width: var(--page-width);
+    text-align: center;
+}
+
 ul { 
     margin: 0 auto 10px auto;
     padding: 0;
