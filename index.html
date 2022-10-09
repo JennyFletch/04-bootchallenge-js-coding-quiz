@@ -19,13 +19,22 @@
 
         <h1 id="welcomeMessageEl">Coding Quiz Challenge</h1> <!-- Hidden after quiz begins -->
 
-        <div id="highScoresEl"> <!-- Hidden until quiz ends -->
+        <div id="showScoreEl"> <!-- Hidden until quiz ends -->
             <p id="finalScore"></p>
             <p>
                 Enter initials: 
-                <input type="text" name="userInitials" maxlength="3" />
+                <input type="text" id="userInitials" maxlength="3" />
                 <input type="button" name="submitBtn" value="Submit" />
             </p>
+        </div>
+
+        <div id="highScoresEl">
+            <ul id="scoreList"></ul>
+            <div id="buttons">
+                <input type="button" class="submitBtn" value="Go Back" />
+                <input type="button" class="submitBtn" value="Clear Highscores" />
+            </div>
+
         </div>
 
         <h3 id="quizQuestionEl"></h3>
@@ -34,7 +43,7 @@
     <main>
         <ul id="quizAnswersEl">
             <li id="getStarted">
-                <span>Start Quiz</span>
+                <span>Start Quiz</span> <!-- Hidden after quiz begins -->
             </li>
         </ul>
         <p id="system-message"></p>

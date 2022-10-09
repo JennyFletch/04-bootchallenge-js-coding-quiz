@@ -1,13 +1,17 @@
 // Global variables and page elements
 
+var scoreLink = document.querySelector("#scoreLink");
 var welcomeEl = document.querySelector("#welcomeMessageEl");
 var quizQuestionEl = document.querySelector("#quizQuestionEl");
 var quizAnswersEl = document.querySelector("#quizAnswersEl");
 var systemMessage = document.querySelector("#system-message");
 var ticker = document.querySelector("#ticker");
 var getStartedBtn = document.querySelector("#getStarted");
-var highScoresEl = document.querySelector("#highScoresEl");
 var finalScore = document.querySelector("#finalScore");
+var showScoreEl = document.querySelector("#showScoreEl");
+var highScoresEl = document.querySelector("#highScoresEl");
+var userInitials = document.querySelector("#userInitials");
+var scoreList = document.querySelector("#scoreList");
 
 var currentRightAnswer = 0;
 var quizQuestionCurrent = 1;
@@ -16,7 +20,8 @@ var quizScore = 0;
 var userScore = 0;
 var quizStarted = false;
 var gameOver = false;
-const quizHighScores = [];
+
+//localStorage.clear(); // uncomment for testing only
 
 
 // Get a random order for the answers
@@ -31,12 +36,16 @@ function getAnswerOrder() {
     return(numArray);
 }
 
+function showHighScores () {
+
+}
+
 function displayGameOver() {
     quizQuestionEl.setAttribute("style", "display:none");
     welcomeMessageEl.innerHTML = "All done!";
     welcomeMessageEl.setAttribute("style", "display:block");
-    highScoresEl.setAttribute("style", "display:block");
-    highScoresEl.children[0].innerHTML = "Your final score is " + userScore;
+    showScoreEl.setAttribute("style", "display:block");
+    showScoreEl.children[0].innerHTML = "Your final score is " + userScore;
 }
 
 // Display the Question and Answers
@@ -79,7 +88,7 @@ function showQandA(qnum) {
             quizAnswer.setAttribute("data-qNumber", (i+1)); 
             quizAnswersEl.appendChild(quizAnswer);
         }
-        console.log("The right answer is " + currentRightAnswer);
+        // console.log("The right answer is " + currentRightAnswer); // uncomment in test-mode only
     }
 }
 
@@ -100,7 +109,7 @@ function setTimer(){
 
 quizAnswersEl.addEventListener("click", function(event) {
     
-    //event.stopPropagation();
+    event.stopPropagation();
     var element = event.target;
 
     if(element.matches("span") && !quizStarted) {
@@ -134,10 +143,139 @@ quizAnswersEl.addEventListener("click", function(event) {
 });
 
 
+function addToHighScores(userInits, score) {
 
+    var highScoresOld = []; // From localStorage
+    var highScoresNew = {}; // Sorted list to add to localStorage
+    var addNewUserToList = false; // Check if user made the high scores list
+    var lowestOldScore = 100; // Score to replace if new user makes the list
+    var oldUserToBump = 100; // Track which scorer gets dropped from the list
+
+    var jsonScores = JSON.parse(localStorage.getItem('jsonScores'));
+
+    if((jsonScores)) {
+
+        // Check for the list of 5 high scores in localStorage and save them to an array  
+        if(jsonScores.listRank1) { highScoresOld[0] = jsonScores.listRank1; }
+        if(jsonScores.listRank2) { highScoresOld[1] = jsonScores.listRank2; }
+        if(jsonScores.listRank3) { highScoresOld[2] = jsonScores.listRank3; }
+        if(jsonScores.listRank4) { highScoresOld[3] = jsonScores.listRank4; }
+        if(jsonScores.listRank5) { highScoresOld[4] = jsonScores.listRank5; }
+       
+
+        // Loop through the array and compare scores
+        for (var i=0; i < highScoresOld.length; i++) {
+            
+            var scoreCheck = highScoresOld[i];
+            var oldScore = scoreCheck.charAt(scoreCheck.length - 1);
+            
+            if (oldScore <= score) { 
+                addNewUserToList = true; // New score outranks this past score
+                if (highScoresOld.length > 4 && oldScore <= lowestOldScore) {
+                    lowestOldScore = oldScore;
+                    oldUserToBump = i;
+                }
+            } else if (highScoresOld.length < 5) {
+                addNewUserToList = true; // User made list by default
+            }
+        }
+
+        if(addNewUserToList) {
+            var newEntry = userInits + " - " + score;
+            highScoresNew['listRank1'] = newEntry;
+
+            // Load listRanks 2-5, omitting oldUserToBump if necessary
+            if(!(oldUserToBump > 5)) { highScoresOld.splice(oldUserToBump, 1); }
+
+            if(highScoresOld[0]) { highScoresNew['listRank2'] = highScoresOld[0]; }
+            if(highScoresOld[1]) { highScoresNew['listRank3'] = highScoresOld[1]; }
+            if(highScoresOld[2]) { highScoresNew['listRank4'] = highScoresOld[2]; }
+            if(highScoresOld[3]) { highScoresNew['listRank5'] = highScoresOld[3]; }
+
+        } else {
+            // Load listRanks 1-5
+            if(highScoresOld[0]) { highScoresNew['listRank1'] = highScoresOld[0]; }
+            if(highScoresOld[1]) { highScoresNew['listRank2'] = highScoresOld[1]; }
+            if(highScoresOld[2]) { highScoresNew['listRank3'] = highScoresOld[2]; }
+            if(highScoresOld[3]) { highScoresNew['listRank4'] = highScoresOld[3]; }
+            if(highScoresOld[4]) { highScoresNew['listRank5'] = highScoresOld[4]; }
+        }
+
+        // Display Highscores List (new score added to previous list)
+        welcomeMessageEl.innerHTML = "Highscores";
+        showScoreEl.setAttribute("style", "display:none");
+        highScoresEl.setAttribute("style", "display:block");
+
+        var newHighScore = document.createElement("li");
+        newHighScore.textContent = userInits + " - " + score;
+        scoreList.appendChild(newHighScore);
+
+        for (var i=0; i < highScoresOld.length; i++) {
+            var storedHighScore = document.createElement("li");
+            storedHighScore.textContent = highScoresOld[i];
+            scoreList.appendChild(storedHighScore);
+        }
+
+        // Build the new JSON string and save new list to localStorage
+        localStorage.setItem('jsonScores', JSON.stringify(highScoresNew));
+
+    } else {
+        // Create the jsonScores object and set current user to listRank1
+        console.log("On the first-run path.");
+        var newEntry = userInits + " - " + score;
+        var newList = { "listRank1": newEntry }
+        localStorage.setItem('jsonScores', JSON.stringify(newList));
+
+        // Display Highscores List (single user)
+        welcomeMessageEl.innerHTML = "Highscores";
+        showScoreEl.setAttribute("style", "display:none");
+        highScoresEl.setAttribute("style", "display:block");
+
+        var newHighScore = document.createElement("li");
+        newHighScore.textContent = userInits + " - " + score;
+        scoreList.appendChild(newHighScore);
+    }
+}
 
 
 // Allow user to track high score
+showScoreEl.addEventListener("click", function(event) {
+    // if user entered initials, add them to high score list
+    event.stopPropagation();
+    var element = event.target;
+    if(element.matches('input[type="button"]')) {
+        if(userInitials.value){
+            var userInits = userInitials.value;
+            var score = userScore;
+            addToHighScores(userInits, score); 
+        } 
+    }
+    
+});
+
 
 // Show list of previous high scores
+highScoresEl.addEventListener("click", function(event) {
+
+    event.stopPropagation();
+    //which button was it?
+    var element = event.target;
+
+    //if go back
+    if(element.value === "Go Back") {
+        console.log('go back');
+    }
+
+    //if clear highscores
+    if(element.value === "Clear Highscores") {
+        console.log('clear highscores');
+    }
+
+});
+
+
+
+
+
+
 

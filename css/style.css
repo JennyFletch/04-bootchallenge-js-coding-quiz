@@ -1,6 +1,7 @@
 :root {
     --accent-color: #710e77;
     --accent-highlight-color: #95139e;
+    --accent-color-light: #f7eef7;
     --page-width: 600px;
 }
 
@@ -31,9 +32,14 @@ header section {
     font-weight: bold;
 }
 
-header section a {
+header section #score-link {
     text-decoration: underline;
     color: var(--accent-color);
+    cursor: pointer;
+}
+
+header section #score-link:hover {
+    color: var(--accent-highlight-color);
 }
 
 ul { 
@@ -80,29 +86,53 @@ p#system-message {
     font-style: italic;
 }
 
-#highScoresEl {
+#showScoreEl, #highScoresEl {
     display: none;
 }
 
-#highScoresEl p {
+#showScoreEl p, #highScoresEl p {
     text-align: center;
 }
 
-#highScoresEl p#finalScore {
+#showScoreEl p#finalScore {
     font-size: 1.25rem;
     padding-bottom: 20px;
     font-weight: bold
 }
 
-#highScoresEl .submitBtn {
+#highScoresEl #buttons {
+    margin: 0 auto 10px auto;
+    padding: 0;
+    max-width: var(--page-width);
+    display: flex;
+    flex-direction: row;
+    justify-content: flex-start;
+}
+
+#showScoreEl .submitBtn, #highScoresEl .submitBtn {
     background-color: var(--accent-color);
     padding: 8px 26px;
     border: none;
     border-radius: 4px;
 }
 
-#highScoresEl:hover .submitBtn {
+#highScoresEl #buttons .submitBtn {
+    margin-right: 10px;
+    color:#fff; 
+}
+
+#highScoresEl #buttons .submitBtn:hover {
     background-color: var(--accent-highlight-color);
+}
+
+#scoreList li {
+    background-color: var(--accent-color-light);
+    display: block;
+    width:92%;
+    padding: 8px 4%;
+    border-radius: 4px;
+    color:#000;
+    font-weight: bold;
 }
 
 @media(max-width:768px) {
