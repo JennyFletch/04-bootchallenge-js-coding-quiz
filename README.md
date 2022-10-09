@@ -1,8 +1,8 @@
 # 04-bootchallenge-js-coding-quiz
-Bootcamp Challenge Assignment 4: Use advanced Javascript to create a timed coding quiz
+Bootcamp Challenge Assignment 4: Use advanced JavaScript to create a timed coding quiz
 
 ## Bootcamp Challenge Assignment - Module 04
-The challenge for Module 4 was to build a quiz game from scratch using advanced Javascript concepts. A timer was required that would penalize the user with a 10-second deficit for every incorrect answer, and at the end of the quiz the user would be able to log their initials to compare the score they received with others saved in localStorage.
+The challenge for Module 4 was to build a quiz game from scratch using advanced JavaScript concepts. A timer was required that would penalize the user with a 10-second deficit for every incorrect answer, and at the end of the quiz the user would be able to log their initials to compare the score they received with others saved in localStorage.
 
 <br />
 
