@@ -1,3 +1,4 @@
+/* -- GLOBAL VARIABLES --*/
 :root {
     --accent-color: #710e77;
     --accent-highlight-color: #95139e;
@@ -5,6 +6,7 @@
     --page-width: 600px;
 }
 
+/*-- GLOBAL ELEMENT STYLES --*/
 body { 
     font-family: Arial, Helvetica, sans-serif; 
     font-size: 18px; 
@@ -24,6 +26,7 @@ h3 {
     text-align: left;
 }
 
+/*-- SITE-SPECIFIC STYLING --*/
 header section { 
     display: flex;
     flex-direction: row;
@@ -143,6 +146,7 @@ p#system-message {
     font-weight: bold;
 }
 
+/*-- ADJUSTMENTS FOR SMALL SCREENS --*/
 @media(max-width:768px) {
     h1, h3 {
         font-size: 1.75rem;

@@ -1,5 +1,4 @@
 // Global variables and page elements
-
 var topLinksEl = document.querySelector("#topLinks");
 var scoreLink = document.querySelector("#score-link");
 var welcomeEl = document.querySelector("#welcomeMessageEl");
@@ -247,7 +246,7 @@ function addToHighScores(userInits, score) {
         highScoresEl.setAttribute("style", "display:block");
         topLinksEl.setAttribute("style", "display:none");
 
-        // Make sure it's a real user and not a call from View Highscores
+        // Make sure it's a real user and not a call to View Highscores function
         if(score >= 0 && addNewUserToList) {
             var newHighScore = document.createElement("li");
             newHighScore.textContent = userInits + " - " + score;
