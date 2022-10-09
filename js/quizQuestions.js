@@ -1,4 +1,4 @@
-var numOfQuestions = 8;
+var numOfQuestions = 10;
 
 var quizQuestion1 = [
     "Is JavaScript a compiled or interpreted language?",
