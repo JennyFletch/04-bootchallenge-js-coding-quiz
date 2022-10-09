@@ -1,5 +1,6 @@
 // Global variables and page elements
 
+var topLinksEl = document.querySelector("#topLinks");
 var scoreLink = document.querySelector("#score-link");
 var welcomeEl = document.querySelector("#welcomeMessageEl");
 var gameInstructionsEl = document.querySelector("#gameInstructions");
@@ -85,7 +86,6 @@ function showQandA(qnum) {
     } else {
 
         // There's another question. Show it to the user.
-
         quizQuestionEl.innerHTML = eval(currentQuestion)[0];
 
         // Get a random order for the answers
@@ -245,6 +245,7 @@ function addToHighScores(userInits, score) {
         welcomeMessageEl.innerHTML = "Highscores";
         showScoreEl.setAttribute("style", "display:none");
         highScoresEl.setAttribute("style", "display:block");
+        topLinksEl.setAttribute("style", "display:none");
 
         // Make sure it's a real user and not a call from View Highscores
         if(score >= 0 && addNewUserToList) {
@@ -324,6 +325,7 @@ highScoresEl.addEventListener("click", function(event) {
         getStartedEl.setAttribute("style", "display:none"); // Hide the get-started button
         quizQuestionEl.setAttribute("style", "display:none"); // Hide the H3 tag
         highScoresEl.setAttribute("style", "display:none"); // Hide the highscores list and buttons
+        topLinksEl.setAttribute("style", "display:flex"); // Show the top button and timer
         welcomeEl.innerHTML = "Coding Quiz Challenge"; // Show the welcome message
         gameInstructionsEl.setAttribute("style", "display:block"); // Show the instructions
         quizAnswersEl.setAttribute("style", "display:flex;");
